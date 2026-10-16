@@ -7,10 +7,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Download project
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build APK
-        uses: docker://barichello/godot-ci:4.3
+      - name: Build Android APK
+        uses: barichello/godot-ci:4.3
         with:
           args: godot --headless --path . --export-debug "Android" asatir.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: asatir-apk
+          path: asatir.apk
