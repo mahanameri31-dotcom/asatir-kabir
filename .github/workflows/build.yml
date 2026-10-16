@@ -6,13 +6,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Android APK
-        uses: barichello/godot-ci:4.3
-        with:
-          args: godot --headless --path . --export-debug "Android" asatir.apk
+      - name: Build APK
+        run: godot --headless --path . --export-debug "Android" asatir.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
