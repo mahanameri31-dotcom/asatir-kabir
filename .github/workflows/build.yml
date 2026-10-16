@@ -8,25 +8,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Download project
         uses: actions/checkout@v4
 
-      - name: Show project files
+      - name: Check project files
         run: |
-          echo "Checking project files..."
+          echo "Current directory:"
+          pwd
+          echo "Root files:"
           ls -la
-          test -f project.godot
-          test -f export_presets.cfg
+          echo "Searching for Godot project and export preset:"
+          find . \( -name project.godot -o -name export_presets.cfg \) -print
+
+      - name: Check required files
+        run: |
+          test -f project.godot || {
+            echo "ERROR: project.godot is missing from the repository root."
+            exit 1
+          }
+          test -f export_presets.cfg || {
+            echo "ERROR: export_presets.cfg is missing from the repository root."
+            exit 1
+          }
+
+      - name: Prepare Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.3.0
+          use-dotnet: false
+
+      - name: Show Godot version
+        run: godot --version
 
       - name: Build APK
         run: |
-          docker run --rm \
-            -v "$PWD:/project" \
-            -w /project \
-            barichello/godot-ci:4.3 \
-            godot --headless --verbose --path /project --export-debug "Android" /project/asatir.apk
+          godot --headless --path . --export-debug "Android" asatir.apk
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: asatir-apk
