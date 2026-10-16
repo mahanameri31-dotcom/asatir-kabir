@@ -6,25 +6,33 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show project files
+      - name: Check project files
         run: |
-          echo "Checking project files..."
           ls -la
           test -f project.godot
           test -f export_presets.cfg
 
+      - name: Install Android export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          wget -O /tmp/templates.tpz \
+            https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          mkdir -p /tmp/godot-templates
+          cd /tmp/godot-templates
+          unzip -q /tmp/templates.tpz
+          cp -r templates/* ~/.local/share/godot/export_templates/4.3.stable/
+
       - name: Build APK
         run: |
-          docker run --rm \
-            -v "$PWD:/project" \
-            -w /project \
-            barichello/godot-ci:4.3 \
-            godot --headless --verbose --path /project --export-debug "Android" /project/asatir.apk
+          godot --headless --verbose --path . \
+            --export-debug "Android" asatir.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
