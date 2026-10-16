@@ -20,7 +20,13 @@ jobs:
           test -f export_presets.cfg
 
       - name: Build APK
-        uses: barichello/godot-ci:4.3
+        uses:       - name: Build APK
+        run: |
+          docker run --rm \
+            -v "$PWD:/project" \
+            -w /project \
+            barichello/godot-ci:4.3 \
+            godot --headless --verbose --path /project --export-debug "Android" /project/asatir.apk
         with:
           args: --headless --verbose --path . --export-debug "Android" asatir.apk
 
