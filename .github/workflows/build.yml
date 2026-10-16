@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -14,21 +15,16 @@ jobs:
         run: |
           echo "Checking project files..."
           ls -la
-          echo "Checking Godot project..."
           test -f project.godot
-          echo "Checking export preset..."
           test -f export_presets.cfg
 
       - name: Build APK
-        uses:       - name: Build APK
         run: |
           docker run --rm \
             -v "$PWD:/project" \
             -w /project \
             barichello/godot-ci:4.3 \
             godot --headless --verbose --path /project --export-debug "Android" /project/asatir.apk
-        with:
-          args: --headless --verbose --path . --export-debug "Android" asatir.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
