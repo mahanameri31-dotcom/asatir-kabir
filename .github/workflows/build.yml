@@ -1,0 +1,16 @@
+name: Build Asatir Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Build APK
+        uses: docker://barichello/godot-ci:4.3
+        with:
+          args: godot --headless --path . --export-debug "Android" asatir.apk
